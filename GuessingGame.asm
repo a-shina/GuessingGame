@@ -5,20 +5,20 @@
 .data
 	title:		.asciiz	"Guessing Game by Adrian Shina\n"
 	greeting:	.asciiz	"\nWhat is your name?: "
-	greeting2:	.asciiz 	"\nHello, "
+	greeting2:	.asciiz "\nHello, "
 	userName:	.space	64 
-	message:	.asciiz 		"I have picked a number between 1 and 100. You have 10 attempts to guess the number.\n"
-	attempt:	.asciiz		"\nAttempt #"
+	message:	.asciiz "I have picked a number between 1 and 100. You have 10 attempts to guess the number.\n"
+	attempt:	.asciiz	"\nAttempt #"
 	colon:		.asciiz	":"
 	prompt:		.asciiz	" Enter a guess between 1 and 100: "
 	hintH:		.asciiz	"Too high!\n"
 	hintL:		.asciiz	"Too low!\n"
-	W:		.asciiz		"\nCongrats, you won! You got it in "
-	W2:		.asciiz		" guesses."
-	L:		.asciiz		"\nSorry, you have reached the maximum number of guesses! You lost.\n"
-	L2:		.asciiz 		"The correct number was: "
+	W:		.asciiz	"\nCongrats, you won! You got it in "
+	W2:		.asciiz	" guesses."
+	L:		.asciiz	"\nSorry, you have reached the maximum number of guesses! You lost.\n"
+	L2:		.asciiz "The correct number was: "
 	farewell:	.asciiz	"\nGoodbye, "
-	guesses:	.asciiz		"\n\nYour guesses: "
+	guesses:	.asciiz	"\n\nYour guesses: "
 	commaSpace:	.asciiz	", "	
 	
 .text
@@ -29,22 +29,22 @@
 
 #	while (userGuess != randomNum && tries < 10) {
 #		prompt user and store the integer in guess
-#       tries++;
+#       	tries++;
 #
 #		if (userGuess > randomNum) {
 #       		print too high
-#       }
-#       else if (userGuess < randomNum) {
-#           print too low
-#       }
-#       else {
+#       	}
+#       	else if (userGuess < randomNum) {
+#           		print too low
+#       	}
+#       	else {
 #       		print congrats	
-#        }
-#    }
+#        	}
+#    	}
 
-#    if (userGuess != randomNum && tries >= 10) {
-#        print you lost
-#    }
+#	if (userGuess != randomNum && tries >= 10) {
+#       	print you lost
+#	}
 
 
 	main:
@@ -98,12 +98,12 @@
 	# Register mappings:
 	#	tries: $t0, randomNum: $t1, guess: $t2
 		while: 
-			jal promptUser			# prompt user to enter a guess
+			jal promptUser		# prompt user to enter a guess
 			beq $t2, $t1, userWon	# if(guess == randomNum) then congratulate user
 			bge $t0, 10, userLost	# if(tries >= 10) then print user lost
-			blt $t2, $t1, tooLow		# else if(guess < randomNum) then print too low	
+			blt $t2, $t1, tooLow	# else if(guess < randomNum) then print too low	
 			bgt $t2, $t1, tooHigh	# else print too high
-			j while					# jump back to the beginning of the loop
+			j while			# jump back to the beginning of the loop
 			
 			
 		done:	
@@ -156,7 +156,7 @@
 		li $v0, 4
 		la $a0, hintH
 		syscall
-		j promptUser		# go back to prompt user
+		j promptUser	# go back to prompt user
 
 		
 	tooLow:
@@ -164,16 +164,16 @@
 		li $v0, 4
 		la $a0, hintL
 		syscall
-		j promptUser		# go back to prompt user
+		j promptUser	# go back to prompt user
 
 
 	userWon:
 		# Produce sound
 		li $v0, 31	# midi output
-	    addi $a1, $a1, 1000000 # duration in ms
-	    addi $a2, $a2, 114	# instrument (percussion)
+	    	addi $a1, $a1, 1000000 # duration in ms
+	    	addi $a2, $a2, 114	# instrument (percussion)
 	    	addi $a3, $a3, 50	# volume
-	    syscall
+	    	syscall
 		
 		# Print congrats and number of guesses it took
 		li $v0, 4
@@ -186,7 +186,7 @@
 		la $a0, W2
 		syscall
 		
-		j showArray		# go to showArray
+		j showArray	# go to showArray
 
 
 	userLost:
@@ -201,7 +201,7 @@
 		li $v0, 1
 		syscall
 		
-		j showArray		# go to showArray
+		j showArray	# go to showArray
 		
 		
 	showArray:
@@ -228,7 +228,7 @@
 		la $a0, commaSpace
 		syscall
 		
-		j printArray		# jump back to loop
+		j printArray	# jump back to loop
 
 
 		
