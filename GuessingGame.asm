@@ -1,24 +1,24 @@
 # Author:	Adrian Shina
-# Date:		4/13/2021
-# Descrption:	Guessing Game in MIPS		
+# Date:		4/26/2021
+# Descrption:	Guessing Game in MIPS
 
 .data
 	title:		.asciiz	"Guessing Game by Adrian Shina\n"
 	greeting:	.asciiz	"\nWhat is your name?: "
-	greeting2:	.asciiz "\nHello, "
+	greeting2:	.asciiz 	"\nHello, "
 	userName:	.space	64 
-	message:	.asciiz "I have picked a number between 1 and 100. You have 10 attempts to guess the number.\n"
-	attempt:	.asciiz	"\nAttempt #"
+	message:		.asciiz 	"I have picked a number between 1 and 100. You have 10 attempts to guess the number.\n"
+	attempt:		.asciiz	"\nAttempt #"
 	colon:		.asciiz	":"
 	prompt:		.asciiz	" Enter a guess between 1 and 100: "
 	hintH:		.asciiz	"Too high!\n"
 	hintL:		.asciiz	"Too low!\n"
-	W:		.asciiz	"\nCongrats, you won! You got it in "
-	W2:		.asciiz	" guesses."
-	L:		.asciiz	"\nSorry, you have reached the maximum number of guesses! You lost.\n"
-	L2:		.asciiz "The correct number was: "
+	W:		.asciiz		"\nCongrats, you won! You got it in "
+	W2:		.asciiz		" guesses."
+	L:		.asciiz		"\nSorry, you have reached the maximum number of guesses! You lost.\n"
+	L2:		.asciiz 		"The correct number was: "
 	farewell:	.asciiz	"\nGoodbye, "
-	guesses:	.asciiz	"\n\nYour guesses: "
+	guesses:		.asciiz	"\n\nYour guesses: "
 	commaSpace:	.asciiz	", "	
 	
 .text
@@ -29,22 +29,22 @@
 
 #	while (userGuess != randomNum && tries < 10) {
 #		prompt user and store the integer in guess
-#       	tries++;
+#       tries++;
 #
 #		if (userGuess > randomNum) {
 #       		print too high
-#       	}
-#       	else if (userGuess < randomNum) {
-#           		print too low
-#       	}
-#       	else {
+#       }
+#       else if (userGuess < randomNum) {
+#           print too low
+#       }
+#       else {
 #       		print congrats	
-#        	}
-#    	}
+#        }
+#    }
 
-#	if (userGuess != randomNum && tries >= 10) {
-#       	print you lost
-#	}
+#    if (userGuess != randomNum && tries >= 10) {
+#        print you lost
+#    }
 
 
 	main:
@@ -75,18 +75,23 @@
 		la $a0, message
 		syscall
 		
-		# Initialize variable
-		addi $t0, $t0, 0		# int tries = 0
-
+		# Call guess function using stack pointer
+		addi $sp, $sp, -4 
+		sw $ra, 0($sp)
+		jal guess
+		lw $ra, 0($sp)
+		addi $sp, $sp, 4
+		li $v0, 0
+		jr $ra 
+		
+	guess:
 		# Generate random number in the range [1, 100]
-		li $v0, 42		# generate the random number and store it in $a0
-		la $a1, 100		# set upper bound to 100 (exclusive)
+		li $v0, 42	# generate the random number and store it in $a0
+		la $a1, 100	# set upper bound to 100 (exclusive)
 		syscall
 
-		addi $a0, $a0, 1		# add 1 to the lower and upper bound to make it between 1 and 100 (inclusive)
-		#li $v0, 1			# print integer
-		#syscall
-		move $t1, $a0		# store the random number in $t1
+		addi $a0, $a0, 1	# add 1 to the lower and upper bound -> [1,100]
+		move $t1, $a0	# store the random number in $t1
 		
 		# Create dynamic array to store the guesses
 		li $v0, 9	# allocate memory for new record
@@ -96,28 +101,28 @@
 		li $t9, 0       # set current offset to 0
 
 	# Register mappings:
-	#	tries: $t0, randomNum: $t1, guess: $t2
-		while: 
-			jal promptUser		# prompt user to enter a guess
-			beq $t2, $t1, userWon	# if(guess == randomNum) then congratulate user
-			bge $t0, 10, userLost	# if(tries >= 10) then print user lost
-			blt $t2, $t1, tooLow	# else if(guess < randomNum) then print too low	
-			bgt $t2, $t1, tooHigh	# else print too high
-			j while			# jump back to the beginning of the loop
+	#	tries: $t0, randomNum: $t1, userGuess: $t2
+	while: 
+		jal promptUser			# prompt user to enter a guess
+		beq $t2, $t1, userWon	# if(userGuess == randomNum) then congratulate user
+		bge $t0, 10, userLost	# if(tries >= 10) then print user lost
+		blt $t2, $t1, tooLow		# else if(userGuess < randomNum) then print too low	
+		bgt $t2, $t1, tooHigh	# else print too high
+		j while					# jump back to the beginning of the loop
 			
 			
-		done:	
-			# Print farewell message
-			li $v0, 4
-			la $a0, farewell
-			syscall
-			li $v0, 4
-			la $a0, userName
-			syscall
+	done:	
+		# Print farewell message
+		li $v0, 4
+		la $a0, farewell
+		syscall
+		li $v0, 4
+		la $a0, userName
+		syscall
 
-			# Exit program
-			li $v0, 10
-			syscall
+		# Exit program
+		li $v0, 10
+		syscall
 
 
 	promptUser:
@@ -156,24 +161,24 @@
 		li $v0, 4
 		la $a0, hintH
 		syscall
-		j promptUser	# go back to prompt user
+		j promptUser		# go back to prompt user
 
 		
 	tooLow:
-		# Print too low
+	    # Print too low
 		li $v0, 4
 		la $a0, hintL
 		syscall
-		j promptUser	# go back to prompt user
+		j promptUser		# go back to prompt user
 
 
 	userWon:
 		# Produce sound
-		li $v0, 31	# midi output
-	    	addi $a1, $a1, 1000000 # duration in ms
-	    	addi $a2, $a2, 114	# instrument (percussion)
-	    	addi $a3, $a3, 50	# volume
-	    	syscall
+		li $v0, 31				# midi output
+	    addi $a1, $a1, 100000 	# duration in ms
+	    addi $a2, $a2, 2			# instrument
+	    	addi $a3, $a3, 50		# volume
+	    syscall
 		
 		# Print congrats and number of guesses it took
 		li $v0, 4
@@ -186,10 +191,17 @@
 		la $a0, W2
 		syscall
 		
-		j showArray	# go to showArray
+		j showArray		# go to showArray
 
 
 	userLost:
+		# Produce sound
+		li $v0, 31				# midi output
+	    addi $a1, $a1, 100000 	# duration in ms
+	    addi $a2, $a2, 9			# instrument
+	    	addi $a3, $a3, 50		# volume
+	    syscall
+	    
 		# Print user lost and the correct number
 		li $v0, 4
 		la $a0, L
@@ -201,7 +213,7 @@
 		li $v0, 1
 		syscall
 		
-		j showArray	# go to showArray
+		j showArray		# go to showArray
 		
 		
 	showArray:
@@ -228,7 +240,7 @@
 		la $a0, commaSpace
 		syscall
 		
-		j printArray	# jump back to loop
+		j printArray		# jump back to loop
 
 
 		
